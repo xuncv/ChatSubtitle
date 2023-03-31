@@ -1,0 +1,11 @@
+import win.ui;
+/*DSG{{*/
+var winform = win.form(text="日志";right=759;bottom=469)
+winform.add(
+richedit={cls="richedit";text="RichEdit";left=9;top=7;right=752;bottom=463;bgcolor=0;color=16777215;edge=1;multiline=1;z=1}
+)
+/*}}*/
+
+winform.show();
+win.loopMessage();
+return winform;

@@ -1,0 +1,122 @@
+﻿
+namespace chatgpt
+
+class summary{
+	ctor( apikey,subtitle,proxy,maxChar=3500,maxMessage=5 ){
+		this.client = web.rest.jsonClient(,proxy)
+		this.client.setAuthToken(apikey)
+		this.subtitleStr = ..string.load(subtitle)
+		this.maxMessage = maxMessage
+		this.messages = {
+        	{"role": "system", "content": `
+        	1.你是一名专业的视频内容编辑，帮我用简体中文总结视频的内容精华。
+        	2.请你将webvtt格式字幕文本进行总结，提炼的内容不超过100字，不要重复内容。在关键内容后面标注时间轴，以便我回看视频。字幕中可能有错别字，如果你发现了错别字请改正，
+        	3.如果字幕中有歌词，帮我忽略它，这不是我想要的。
+        	4.记得不要重复句子，确保所有的句子都足够精简，清晰完整。
+        	5.因字幕文件过长，我发送分段的文本内容，不要有多余的背景描述，直接总结干货
+        	`}
+        }//并在每条列表后附上时间戳，以便我回看视频。以无序列表的方式返回，不带序号，内容不超过5条，每条后面带有时间戳，以便我回看视频。回复语言为简体中文。字幕中可能有错别字，如果你发现了错别字请改正，
+        this.resultMd = ''
+	};
+	
+	askStream = function(text,callback,...){
+		var userMessage = {"role": "user", "content":text}
+		..table.push(this.messages,userMessage)
+		re = this.client.request( "https://api.openai.com/v1/chat/completions",{
+			"model":"gpt-3.5-turbo",
+			"stream":true,
+			"messages":this.messages
+		},"POST",,callback)
+	}
+	
+	ask = function(text){
+		var userMessage = {"role": "user", "content":text}
+		..table.push(this.messages,userMessage)
+		var re,err,errCode = this.client.request( "https://api.openai.com/v1/chat/completions",{
+			model = "gpt-3.5-turbo",
+			messages = this.messages,			
+		},"POST")
+		..table.pop( this.messages )
+		if(re){
+			..table.push(this.messages,re.choices[1].message)
+			this.resultMd = ..string.concat( this.resultMd,re.choices[1].message.content )
+			//如果messages消息数超过设定值，随机丢弃一个回复
+			while(#this.messages > this.maxMessage){
+				//var rindex = ..math.random(2,#this.messages-1)
+				//this.messages = ..table.splice(this.messages,rindex,1)	
+				..table.splice(this.messages,2,1)	
+			}
+			if(re.choices[1].finish_reason=="length"){
+				this.ask("继续")
+			}
+		}else {
+			this.ask(text)
+		}
+	}
+	
+	eachChunck = function(maxTokens=3000){
+		// 100个字符逐渐增加块
+		var cur = 0
+		return function(){
+			var remainNumTokens = maxTokens - this.numTokens
+			var s = ''
+			var n = 1
+			do{
+				s = ..string.slice( this.subtitleStr,cur,cur+100*n,true )
+				if(#s==0){
+					break;
+				}
+				n++	
+			}while(gpt_num_tokens(s) <= remainNumTokens-100)
+			cur += 100*n
+			this.ask(s)
+			return s,this.messages[#this.messages].content; 
+		}
+	}
+
+	@_meta
+}
+
+namespace summary{
+	import web.rest.jsonClient
+	import util.metaProperty
+	var _dll = ..raw.loadDll($"~\lib\chatgpt\.dll\tiktoken_dll.dll",,"cdecl")
+	gpt_num_tokens = _dll.gpt_num_tokens
+	_meta = ..util.metaProperty(
+		numTokens = {
+			_get = lambda() reduce(owner.messages,function(prev,next,index,arr){
+				return prev + _dll.gpt_num_tokens(next.content) + 4
+			},0) + 2; 			
+		}
+	)
+}
+
+/**
+re = openai.completions({
+	"model":"gpt-3.5-turbo",
+	"stream":true,
+	"messages":{
+        {"role": "system", "content": "你是一名专业的视频内容编辑，帮我用简体中文总结视频的内容精华。请你将视频字幕文本进行总结（字幕中可能有错别字，如果你发现了错别字请改正），然后以无序列表的方式返回，并在每条列表后附上时间戳，以便我回看视频。记得不要重复句子，确保所有的句子都足够精简，清晰完整。因字幕文件过长，我发送给你的是分段的文本内容，不要有多余的背景描述，直接总结干货"},
+        {"role": "user", "content": input},
+/*
+        {"role": "user", "content": "Who won the world series in 2020?"},
+        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+        {"role": "user", "content": "Where was it played?"}
+*/
+    }
+})
+**/
+
+/**
+data: {"id":"chatcmpl-6xzizZxU0TpiUPRhogL2vZDMhtVxM","object":"chat.completion.chunk","created":1679756641,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"，"},"index":0,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-6xzizZxU0TpiUPRhogL2vZDMhtVxM","object":"chat.completion.chunk","created":1679756641,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"剩"},"index":0,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-6xzizZxU0TpiUPRhogL2vZDMhtVxM","object":"chat.completion.chunk","created":1679756641,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"下"},"index":0,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-6xzizZxU0TpiUPRhogL2vZDMhtVxM","object":"chat.completion.chunk","created":1679756641,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{"content":"的"},"index":0,"finish_reason":null}]}
+
+data: {"id":"chatcmpl-6xzizZxU0TpiUPRhogL2vZDMhtVxM","object":"chat.completion.chunk","created":1679756641,"model":"gpt-3.5-turbo-0301","choices":[{"delta":{},"index":0,"finish_reason":"stop"}]}
+
+data: [DONE]
+**/

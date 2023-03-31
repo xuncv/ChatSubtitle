@@ -1,0 +1,14 @@
+import win.ui;
+/*DSG{{*/
+mainForm = win.form(text="ChatSubtitle";right=782;bottom=843)
+mainForm.add(
+tab={cls="tab";left=4;top=4;right=776;bottom=834;edge=1;z=1}
+)
+/*}}*/
+
+mainForm.tab.loadForm("\forms\markdown.aardio")
+mainForm.tab.loadForm("\forms\formtools.aardio")
+mainForm.tab.loadForm("\forms\formconfig.aardio")
+//mainForm.tab.loadForm("\forms\formlogger.aardio")
+mainForm.show();
+win.loopMessage();

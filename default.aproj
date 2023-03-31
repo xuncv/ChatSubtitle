@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project ver="10" name="ChatSubtitle" libEmbed="true" icon="..." ui="win" output="ChatSubtitle.exe" CompanyName="ChatSubtitle" FileDescription="ChatSubtitle" LegalCopyright="Copyright (C) 作者 2023" ProductName="ChatSubtitle" InternalName="ChatSubtitle" FileVersion="0.0.0.05" ProductVersion="0.0.0.05" publishDir="/dist/" dstrip="false" local="false" ignored="false">
+	<file name="main" path="main.aardio"/>
+	<folder name="窗体" path="forms" comment="" embed="true" local="false" ignored="false">
+		<file name="markdown.aardio" path="forms\markdown.aardio" comment="forms\markdown.aardio"/>
+		<file name="formlogger.aardio" path="forms\formlogger.aardio" comment="forms\formlogger.aardio"/>
+		<file name="formconfig.aardio" path="forms\formconfig.aardio" comment="forms\formconfig.aardio"/>
+		<file name="formtools.aardio" path="forms\formtools.aardio" comment="forms\formtools.aardio"/>
+	</folder>
+	<folder name="res" path="res" embed="true" comment="目录" local="false" ignored="false">
+		<file name="index.html" path="res\index.html" comment="res\index.html"/>
+	</folder>
+</project>

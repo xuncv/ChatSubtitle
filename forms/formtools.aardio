@@ -1,0 +1,71 @@
+import win.ui;
+/*DSG{{*/
+var winform = win.form(text="转换工具";right=678;bottom=738)
+winform.add(
+btn_speech={cls="button";text="转换";left=453;top=188;right=551;bottom=222;z=6};
+btn_v2a={cls="button";text="提取";left=469;top=61;right=560;bottom=95;z=4};
+combobox2={cls="combobox";left=104;top=152;right=253;bottom=174;edge=1;items={};mode="dropdownlist";z=8};
+groupbox={cls="groupbox";text="视频提取音频";left=29;top=28;right=637;bottom=118;edge=1;z=1};
+groupbox2={cls="groupbox";text="音频转字幕webvtt";left=27;top=131;right=632;bottom=232;edge=1;z=2};
+groupbox3={cls="groupbox";text="日志";left=24;top=248;right=664;bottom=729;edge=1;z=9};
+input_audio={cls="edit";left=36;top=191;right=437;bottom=220;edge=1;z=5};
+input_video={cls="edit";left=48;top=61;right=451;bottom=92;edge=1;z=3};
+logger={cls="richedit";left=35;top=268;right=654;bottom=723;bgcolor=0;color=16777215;edge=1;hscroll=1;multiline=1;vscroll=1;z=10};
+static={cls="static";text="选择模型";left=39;top=155;right=99;bottom=180;transparent=1;z=7}
+)
+/*}}*/
+
+import process.ffmpeg
+import whisper
+import fsys
+import fsys.dlg
+import inet.downBox
+import process.ffmpeg
+winform.combobox2.items = whisper.modelsList
+winform.combobox2.selText = "ggml-small.bin"
+
+modelDir = "/models"
+winform.btn_speech.oncommand = function(id,event){
+	var audioPath = fsys.dlg.open()
+	if !audioPath return ;
+	winform.input_audio.text = audioPath
+	var model = winform.combobox2.selText
+	var modelPath = fsys.joinpath(modelDir,model)
+	if(!io.exist(modelPath)){
+		var modelDict = whisper.genModelsUrl()
+		var downBox = inet.downBox(winform,"正在下载模型:" + model,1000)
+		downBox.download( modelDict[model],modelDir)
+	}
+	winform.btn_speech.text = "转换中"
+	winform.btn_speech.disabled = true
+	var speech = whisper( io.fullpath(modelPath),io.fullpath(audioPath))
+	speech.logResponse( winform.logger )
+	speech.waitOne()
+	win.delay(1000)
+	winform.btn_speech.text = "转换"
+	winform.btn_speech.disabled = false
+}
+
+import console
+winform.btn_v2a.oncommand = function(id,event){
+	var videoPath = fsys.dlg.open()
+	if !videoPath return ;
+	winform.input_video.text = videoPath
+	var videoInfo = io.splitpath(videoPath)
+	winform.btn_v2a.disabled = true
+	winform.btn_v2a.text = "提取中..."
+	//var ffmpeg = process.ffmpeg(videoInfo.dir,"-i",videoInfo.file,"-y","-acodec","libmp3lame","-aq", "0",videoInfo.name + ".mp3");
+	
+	var ffmpeg = process.ffmpeg(videoInfo.dir,"-i",videoInfo.file,"-y","-vn","-acodec","copy",videoInfo.name + ".m4a");
+	ffmpeg.logResponse(winform.logger);
+	
+	ffmpeg.waitOne()
+	win.delay(1000)
+	winform.btn_v2a.text = "提取"
+	winform.btn_v2a.disabled = false
+	//指定用文本框异步显示进程输出（不阻塞代码向后执行）
+}
+
+winform.show();
+win.loopMessage();
+return winform;

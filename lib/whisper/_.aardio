@@ -1,0 +1,50 @@
+﻿import process.popen
+import process.job.limitKill;
+import string.cmdline
+import inet.url
+
+class whisper{
+	ctor( model,audio ){
+		args = {
+			"-m" = model;
+			"-ovtt";
+			"-l" = "zh";
+			//"--prompt" = "transcribe to Simplified Chinese";
+			audio
+		}
+		this = ..process.popen(whisperExePath,..string.cmdline.arguments(args))
+		//assertf(this,"创建whisper失败")
+		this.assignToJobObject(..process.job.limitKill)
+		this.codepage = 65001
+	};
+}
+
+namespace whisper{
+	whisperExePath = ..io.appData("/whispaer/whisper.exe",$"\lib\whisper\.res\whisper.exe")
+	whisperDllPath = ..io.appData("/whispaer/Whisper.dll",$"\lib\whisper\.res\Whisper.dll")
+	modelsList = {
+		"ggml-tiny.en.bin"; 
+		"ggml-tiny.bin"; 
+		"ggml-base.en.bin"; 
+		"ggml-base.bin"; 
+		"ggml-small.en.bin";
+		"ggml-small.bin"; 
+		"ggml-medium.en.bin"; 
+		"ggml-medium.bin"; 
+		"ggml-large-v1.bin"; 
+		"ggml-large.bin"
+	}
+	
+	genModelsUrl = function(){
+		var src = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/"
+		var dict = {}
+		for(i=1;#modelsList;1){
+			dict[modelsList[i]] = ..string.format("%s%s",src,modelsList[i])
+		}
+		return dict; 
+	}
+}
+
+/**intellisense()
+whisper() = !process_popen.
+end intellisense**/

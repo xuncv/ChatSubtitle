@@ -1,0 +1,31 @@
+import win.ui;
+/*DSG{{*/
+var winform = win.form(text="设置";right=759;bottom=663)
+winform.add(
+input_apikey={cls="edit";left=110;top=59;right=613;bottom=88;edge=1;z=2};
+input_proxy={cls="edit";left=110;top=100;right=613;bottom=128;edge=1;multiline=1;z=4};
+static={cls="static";text="apiKey：";left=45;top=62;right=97;bottom=86;transparent=1;z=1};
+static2={cls="static";text="代理：";left=48;top=104;right=90;bottom=133;transparent=1;z=3}
+)
+/*}}*/
+
+import fsys.config
+
+config = fsys.config()
+
+winform.bindConfig( config.winform,{
+	edit = "text";
+	radiobutton = "checked";
+	checkbox = "checked";
+	combobox = "selIndex";
+	plus ={
+		["^chk"] = "checked";
+		["^edit"] = "text";
+	};
+	
+} );
+
+
+winform.show();
+win.loopMessage();
+return winform;
