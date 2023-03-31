@@ -28,7 +28,7 @@ class summary{
 			"messages":this.messages
 		},"POST",,callback)
 	}
-	
+
 	ask = function(text){
 		var userMessage = {"role": "user", "content":text}
 		..table.push(this.messages,userMessage)
@@ -64,7 +64,7 @@ class summary{
 			do{
 				s = ..string.slice( this.subtitleStr,cur,cur+100*n,true )
 				if(#s==0){
-					break;
+					return null; 
 				}
 				n++	
 			}while(gpt_num_tokens(s) <= remainNumTokens-100)
@@ -80,6 +80,7 @@ class summary{
 namespace summary{
 	import web.rest.jsonClient
 	import util.metaProperty
+	
 	var _dll = ..raw.loadDll($"~\lib\chatgpt\.dll\tiktoken_dll.dll",,"cdecl")
 	gpt_num_tokens = _dll.gpt_num_tokens
 	_meta = ..util.metaProperty(

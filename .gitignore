@@ -1,3 +1,4 @@
 winform.table
 /models
 *.bin
+/dist/models

@@ -2,28 +2,19 @@ import win.ui;
 /*DSG{{*/
 var winform = win.form(text="字幕总结";right=759;bottom=785)
 winform.add(
-button={cls="button";text="总结归纳去水";left=639;top=735;right=744;bottom=775;z=2};
-edit={cls="edit";left=24;top=740;right=629;bottom=772;edge=1;multiline=1;z=3};
-static={cls="static";left=8;top=6;right=741;bottom=723;transparent=1;z=1}
+button={cls="button";text="总结归纳去水";left=639;top=735;right=744;bottom=775;z=1};
+edit={cls="edit";left=24;top=740;right=629;bottom=772;edge=1;multiline=1;z=2};
+richedit={cls="richedit";left=4;top=5;right=756;bottom=730;edge=1;multiline=1;wrap=1;z=3}
 )
 /*}}*/
 
-import web.form
-import string.markdown
 import fsys.dlg
-
-var wb = web.form(winform.static)
-
-wb.go("\res\index.html")
-wb.wait();
-
 import thread.command
 
 var listener = thread.command();
-var markdown = string.markdown()
 listener.$updateWb = function( str ){
-	var md = markdown.render(str)
-	wb.body.innerHTML += md
+	winform.richedit.appendText(str)
+	winform.richedit.appendText('\n')
 }
 
 winform.button.oncommand = function(id,event){
@@ -33,20 +24,20 @@ winform.button.oncommand = function(id,event){
 	winform.button.disabled = true
 	winform.button.text = "运行中"
 	
-	var tid = thread.create( function(path){
-		import chatgpt.summary;
-		import thread.command;
-		import fsys.config
-		var config = fsys.config()
-		var gpt = chatgpt.summary(config.winform.input_apikey,path,config.winform.input_proxy)
-		for a,q in gpt.eachChunck(){
-			thread.command.$updateWb(q)
-		}		
-	},path)
-	
-	thread.waitOne(tid)
-	winform.button.disabled = false
-	winform.button.text = "总结归纳去水"
+	thread.invoke( 
+		function(path,winform){
+			import chatgpt.summary;
+			import thread.command;
+			import fsys.config
+			var config = fsys.config()
+			var gpt = chatgpt.summary(config.winform.input_apikey,path,config.winform.input_proxy)
+			for a,q in gpt.eachChunck(){
+				thread.command.$updateWb(q)
+			}
+			winform.button.disabled = false
+			winform.button.text = "总结归纳去水"
+		},path,winform
+	)
 }
 
 winform.show();
