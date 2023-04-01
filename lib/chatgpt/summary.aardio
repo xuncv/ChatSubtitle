@@ -5,7 +5,7 @@ class summary{
 	ctor( apikey,subtitle,proxy,maxChar=3500,maxMessage=5 ){
 		this.client = web.rest.jsonClient(,proxy)
 		this.client.setAuthToken(apikey)
-		this.subtitleStr = ..string.load(subtitle)
+		this.subtitleStr = subtitle //..string.load(subtitle)
 		this.maxMessage = maxMessage
 		this.messages = {
         	{"role": "system", "content": `
@@ -64,9 +64,12 @@ class summary{
 			do{
 				s = ..string.slice( this.subtitleStr,cur,cur+100*n,true )
 				if(#s==0){
-					return null; 
+					return null,null; 
 				}
-				n++	
+				n++
+				if(cur+100*n > #this.subtitleStr){
+					break
+				}
 			}while(gpt_num_tokens(s) <= remainNumTokens-100)
 			cur += 100*n
 			this.ask(s)

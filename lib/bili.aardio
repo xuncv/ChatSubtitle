@@ -1,0 +1,68 @@
+﻿import web.rest.jsonClient
+import inet.whttp
+import web.json
+//用inet.whttp替换inet.http,实现自定义cookie
+inet.http = inet.whttp
+
+class bili{
+	ctor( token ){
+		var client = ..web.rest.jsonClient()
+		client.setHeaders( 
+			["Cookie"] = ..string.format("SESSDATA=%s",token)
+		)
+	
+		this.api = client.api("https://api.bilibili.com/x")
+	};
+	
+	getAid = function(bvid){
+		var view = this.api["web-interface"].view.get(
+			bvid = bvid
+		)
+		return view ? view.data.aid : null; 
+	}
+	
+	getCid = function(bvid){
+		var re = this.api.player.pagelist.get(
+			bvid = bvid
+		)
+		// 暂取第一个cid
+		return re ? re.data[1].cid; 
+	}
+	
+	getSubtitles = function(bvid){
+		var aid = this.getAid(bvid)
+		var cid = this.getCid(bvid)
+		if(aid and cid){
+			var re = this.api.player.v2.get(
+				aid = aid;
+				cid = cid
+			)
+			// 暂取第一个cc字幕
+			return (re and #re.data.subtitle.subtitles) ? re.data.subtitle.subtitles[1].subtitle_url: null; 
+		}
+		return null; 
+	}
+	
+	parse2vtt = function(url){
+		var url = ..string.startWith(url,"http:") ? url : "http:" ++ url
+		var res,err,code = ..inet.whttp().get(url)
+		if(res){
+			var jsn = ..web.json.parse(res)
+			return reduce(jsn.body,function(prev,next,index,arr){
+				return ..string.concat(prev,_duration2hms(next.from), " --> ",_duration2hms(next.to),'\n',next.content,'\n\n')
+			},'WEBVTT\n\n')
+		}
+	}
+	@_meta
+}
+
+namespace bili {
+	_duration2hms = lambda(sec) ..string.format("%02d:%02d:%02d.%d",..math.floor(sec/3600),sec/60%60,sec%60,sec%1*1000)
+}
+
+/*
+bilitoken = "xxxxxxxxxxxxxx";
+bilibili = bili("4d1170f2%2C1695873041%2C1b522%2A42")
+url = bilibili.getSubtitles("BV1hs4y177zp")
+vtt = bilibili.parse2vtt(url)
+*/

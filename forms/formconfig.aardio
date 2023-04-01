@@ -3,9 +3,11 @@ import win.ui;
 var winform = win.form(text="设置";right=759;bottom=663)
 winform.add(
 input_apikey={cls="edit";left=110;top=59;right=613;bottom=88;edge=1;z=2};
+input_bili_token={cls="edit";left=109;top=146;right=610;bottom=177;edge=1;z=6};
 input_proxy={cls="edit";left=110;top=100;right=613;bottom=128;edge=1;multiline=1;z=4};
 static={cls="static";text="apiKey：";left=45;top=62;right=97;bottom=86;transparent=1;z=1};
-static2={cls="static";text="代理：";left=48;top=104;right=90;bottom=133;transparent=1;z=3}
+static2={cls="static";text="代理：";left=48;top=104;right=90;bottom=133;transparent=1;z=3};
+static3={cls="static";text="B站Token:";left=40;top=155;right=107;bottom=193;transparent=1;z=5}
 )
 /*}}*/
 
