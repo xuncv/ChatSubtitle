@@ -2,19 +2,14 @@
 namespace chatgpt
 
 class summary{
-	ctor( apikey,subtitle,proxy,maxChar=3500,maxMessage=5 ){
+	ctor( apikey,subtitle,proxy,prompt,maxChar=3500,maxMessage=5 ){
 		this.client = web.rest.jsonClient(,proxy)
 		this.client.setAuthToken(apikey)
 		this.subtitleStr = subtitle //..string.load(subtitle)
+		this.charLen = ..string.len(subtitle)
 		this.maxMessage = maxMessage
 		this.messages = {
-        	{"role": "system", "content": `
-        	1.你是一名专业的视频内容编辑，帮我用简体中文总结视频的内容精华。
-        	2.请你将webvtt格式字幕文本进行总结，提炼的内容不超过100字，不要重复内容。在关键内容后面标注时间轴，以便我回看视频。字幕中可能有错别字，如果你发现了错别字请改正，
-        	3.如果字幕中有歌词，帮我忽略它，这不是我想要的。
-        	4.记得不要重复句子，确保所有的句子都足够精简，清晰完整。
-        	5.因字幕文件过长，我发送分段的文本内容，不要有多余的背景描述，直接总结干货
-        	`}
+        	{"role": "system", "content":prompt:defaultprompt}
         }//并在每条列表后附上时间戳，以便我回看视频。以无序列表的方式返回，不带序号，内容不超过5条，每条后面带有时间戳，以便我回看视频。回复语言为简体中文。字幕中可能有错别字，如果你发现了错别字请改正，
         this.resultMd = ''
 	};
@@ -73,7 +68,7 @@ class summary{
 			}while(gpt_num_tokens(s) <= remainNumTokens-100)
 			cur += 100*n
 			this.ask(s)
-			return s,this.messages[#this.messages].content; 
+			return s,this.messages[#this.messages].content,cur/this.charLen; 
 		}
 	}
 
@@ -83,7 +78,6 @@ class summary{
 namespace summary{
 	import web.rest.jsonClient
 	import util.metaProperty
-	
 	var _dll = ..raw.loadDll($"~\lib\chatgpt\.dll\tiktoken_dll.dll",,"cdecl")
 	gpt_num_tokens = _dll.gpt_num_tokens
 	_meta = ..util.metaProperty(
@@ -93,6 +87,15 @@ namespace summary{
 			},0) + 2; 			
 		}
 	)
+	
+	defaultprompt = `
+1.你是一名专业的视频内容编辑，帮我用简体中文总结视频的内容精华。
+2.请你将webvtt格式字幕文本进行总结，提炼的内容不超过100字，不要重复内容。在关键内容后面标注时间轴，以便我回看视频。字幕中可能有错别字，如果你发现了错别字请改正，
+3.如果字幕中有歌词，帮我忽略它，这不是我想要的。
+4.记得不要重复句子，确保所有的句子都足够精简，清晰完整。
+5.因字幕文件过长，我发送分段的文本内容，不要有多余的背景描述，直接总结干货
+6.这是淘宝教育培训的教程，用相关词汇修正字幕中的错误
+	`
 }
 
 /**

@@ -74,19 +74,22 @@ winform.button.oncommand = function(id,event){
 	}
 	winform.edit.text = path
 	winform.button.disabled = true
-	winform.button.text = "运行中"
+	winform.button.text = "运行中-0%"
 	thread.invoke(
 		function(subText,winform){
 			import chatgpt.summary;
 			import thread.command;
 			import fsys.config
 			var config = fsys.config()
-			var gpt = chatgpt.summary(config.winform.input_apikey,subText,config.winform.input_proxy)
-			for a,q in gpt.eachChunck(){
+			var gpt = chatgpt.summary(config.winform.input_apikey,subText,config.winform.input_proxy,config.winform.input_prompt)
+			for a,q,ratio in gpt.eachChunck(){
 				if(!winform){
 					break
 				}
+				
 				thread.command.$updateWb(q)
+				winform.button.text = string.format("运行中-%.02f", ratio*100) + "%"
+				
 			}
 			winform.button.disabled = false
 			winform.button.text = "总结归纳去水"
