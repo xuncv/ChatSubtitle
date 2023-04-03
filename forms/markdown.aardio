@@ -86,10 +86,8 @@ winform.button.oncommand = function(id,event){
 				if(!winform){
 					break
 				}
-				
 				thread.command.$updateWb(q)
 				winform.button.text = string.format("运行中-%.02f", ratio*100) + "%"
-				
 			}
 			winform.button.disabled = false
 			winform.button.text = "总结归纳去水"

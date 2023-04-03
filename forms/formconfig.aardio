@@ -14,9 +14,7 @@ static4={cls="static";text="prompt：";left=42;top=204;right=97;bottom=235;trans
 /*}}*/
 
 import fsys.config
-
-config = fsys.config()
-
+config  = fsys.config()
 winform.bindConfig( config.winform,{
 	edit = "text";
 	richedit = "text";
@@ -27,9 +25,11 @@ winform.bindConfig( config.winform,{
 		["^chk"] = "checked";
 		["^edit"] = "text";
 	};
-	
 } );
 
+winform.onPosChanged = function(flags,hwndInsertAfter,x,y,cx,cy){ 
+	config.saveAll()
+}
 
 winform.show();
 win.loopMessage();

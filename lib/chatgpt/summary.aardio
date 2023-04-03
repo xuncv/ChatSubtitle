@@ -9,10 +9,19 @@ class summary{
 		this.charLen = ..string.len(subtitle)
 		this.maxMessage = maxMessage
 		this.messages = {
-        	{"role": "system", "content":prompt:defaultprompt}
-        }//并在每条列表后附上时间戳，以便我回看视频。以无序列表的方式返回，不带序号，内容不超过5条，每条后面带有时间戳，以便我回看视频。回复语言为简体中文。字幕中可能有错别字，如果你发现了错别字请改正，
+        	{ "role": "system", "content": #prompt:defaultprompt }
+        }
         this.resultMd = ''
 	};
+	
+	tidyMessages = function(){
+		//如果messages消息数超过设定值，随机丢弃一个回复
+		while(#this.messages > this.maxMessage){
+			//var rindex = ..math.random(2,#this.messages-1)
+			//this.messages = ..table.splice(this.messages,rindex,1)	
+			..table.splice(this.messages,2,1)	
+		}		
+	}
 	
 	askStream = function(text,callback,...){
 		var userMessage = {"role": "user", "content":text}
@@ -29,18 +38,13 @@ class summary{
 		..table.push(this.messages,userMessage)
 		var re,err,errCode = this.client.request( "https://api.openai.com/v1/chat/completions",{
 			model = "gpt-3.5-turbo",
-			messages = this.messages,			
+			messages = this.messages,
 		},"POST")
 		..table.pop( this.messages )
 		if(re){
 			..table.push(this.messages,re.choices[1].message)
 			this.resultMd = ..string.concat( this.resultMd,re.choices[1].message.content )
-			//如果messages消息数超过设定值，随机丢弃一个回复
-			while(#this.messages > this.maxMessage){
-				//var rindex = ..math.random(2,#this.messages-1)
-				//this.messages = ..table.splice(this.messages,rindex,1)	
-				..table.splice(this.messages,2,1)	
-			}
+			this.tidyMessages();
 			if(re.choices[1].finish_reason=="length"){
 				this.ask("继续")
 			}
@@ -49,7 +53,7 @@ class summary{
 		}
 	}
 	
-	eachChunck = function(maxTokens=3000){
+	eachChunck = function(maxTokens=3000,stream=false){
 		// 100个字符逐渐增加块
 		var cur = 0
 		return function(){
@@ -95,7 +99,7 @@ namespace summary{
 4.记得不要重复句子，确保所有的句子都足够精简，清晰完整。
 5.因字幕文件过长，我发送分段的文本内容，不要有多余的背景描述，直接总结干货
 6.这是淘宝教育培训的教程，用相关词汇修正字幕中的错误
-	`
+`
 }
 
 /**
