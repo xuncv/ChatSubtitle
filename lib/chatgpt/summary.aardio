@@ -28,9 +28,17 @@ class summary{
 		..table.push(this.messages,userMessage)
 		re = this.client.request( "https://api.openai.com/v1/chat/completions",{
 			"model":"gpt-3.5-turbo",
-			"stream":true,
+	        "stream":true,
 			"messages":this.messages
 		},"POST",,callback)
+		this.messages = ..table.filter(this.messages,function(v,index){
+			return v.role != "user"; 
+		})
+		//..table.pop( this.messages )
+		if(re){
+			this.tidyMessages();
+		}
+		return true; 
 	}
 
 	ask = function(text){
@@ -53,7 +61,7 @@ class summary{
 		}
 	}
 	
-	eachChunck = function(maxTokens=3000,stream=false){
+	eachChunck = function(maxTokens=3000,stream=false,callback,...){
 		// 100个字符逐渐增加块
 		var cur = 0
 		return function(){
@@ -71,8 +79,13 @@ class summary{
 				}
 			}while(gpt_num_tokens(s) <= remainNumTokens-100)
 			cur += 100*n
-			this.ask(s)
-			return s,this.messages[#this.messages].content,cur/this.charLen; 
+			if(stream and callback){
+				this.askStream(s,callback)
+				return s,true,cur/this.charLen; 
+			}else {
+				this.ask(s)
+				return s,this.messages[#this.messages].content,cur/this.charLen; 
+			}
 		}
 	}
 
