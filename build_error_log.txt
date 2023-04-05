@@ -1,0 +1,12 @@
+﻿错误发生在文件---------------:
+D:\workspace\github.com\ChatSubtitle\lib\whisper\_.aardio
+错误信息---------------:
+
+{Error}:
+{Line}:#47
+{File}:D:\workspace\github.com\ChatSubtitle\lib\whisper\_.aardio
+{Error}:
+{Expected}:')'
+{Match for}:'('
+{Match line}:25 
+{Near}:'}'

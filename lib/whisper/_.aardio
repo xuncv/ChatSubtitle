@@ -1,7 +1,6 @@
 ﻿import process.popen
 import process.job.limitKill;
 import string.cmdline
-import inet.url
 
 class whisper{
 	ctor( model,audio ){
@@ -19,9 +18,9 @@ class whisper{
 	};
 }
 
-namespace whisper{
-	whisperExePath = ..io.appData("/chatsubtitle/whisper/whisper.exe",$"\lib\whisper\.res\whisper.exe")
-	whisperDllPath = ..io.appData("/chatsubtitle/whisper/Whisper.dll",$"\lib\whisper\.res\Whisper.dll")
+namespace whisper{	
+	whisperExePath = ..io.appData("\whisper\whisper.exe",$"\lib\whisper\.res\whisper.exe")
+	whisperDllPath = ..io.appData("\whisper\Whisper.dll",$"\lib\whisper\.res\Whisper.dll")
 	modelsList = {
 		"ggml-tiny.en.bin"; 
 		"ggml-tiny.bin"; 
