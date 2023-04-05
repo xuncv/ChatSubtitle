@@ -20,8 +20,8 @@ class whisper{
 }
 
 namespace whisper{
-	whisperExePath = ..io.appData("/whispaer/whisper.exe",$"\lib\whisper\.res\whisper.exe")
-	whisperDllPath = ..io.appData("/whispaer/Whisper.dll",$"\lib\whisper\.res\Whisper.dll")
+	whisperExePath = ..io.appData("/chatsubtitle/whisper/whisper.exe",$"\lib\whisper\.res\whisper.exe")
+	whisperDllPath = ..io.appData("/chatsubtitle/whisper/Whisper.dll",$"\lib\whisper\.res\Whisper.dll")
 	modelsList = {
 		"ggml-tiny.en.bin"; 
 		"ggml-tiny.bin"; 

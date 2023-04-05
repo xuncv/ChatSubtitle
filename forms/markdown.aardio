@@ -398,7 +398,6 @@ listener.$updateWb = function( str ){
 	wb.body.innerHTML = markdown.render( markdownContainer )
 }
 
-
 var config = fsys.config()
 winform.button.oncommand = function(id,event){
 	var path = winform.edit.text
@@ -436,7 +435,6 @@ winform.button.oncommand = function(id,event){
 			import web.json
 			var config = fsys.config()
 			var gpt = chatgpt.summary(config.winform.input_apikey,subText,config.winform.input_proxy,config.winform.input_prompt)
-			
 			var assitContent = ""
 			callback = function(recvData,recvSize){
 				var arr = table.map( 
@@ -456,15 +454,16 @@ winform.button.oncommand = function(id,event){
 						  },"")
 				thread.command.$updateWb(out)
 			}
-				
-			for a,q,ratio in gpt.eachChunck(,true,callback){
-				if(!winform){
-					break
+
+			for a,status,ratio in gpt.eachChunck(,true,callback){
+				if(!status){
+					break;
 				}
 				winform.button.text = string.format("运行中-%.02f", ratio*100) + "%"
 			}
 			winform.button.disabled = false
 			winform.button.text = "总结归纳去水"
+			
 		},subText,winform
 	)
 }

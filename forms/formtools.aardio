@@ -54,9 +54,9 @@ winform.btn_v2a.oncommand = function(id,event){
 	var videoInfo = io.splitpath(videoPath)
 	winform.btn_v2a.disabled = true
 	winform.btn_v2a.text = "提取中..."
-	//var ffmpeg = process.ffmpeg(videoInfo.dir,"-i",videoInfo.file,"-y","-acodec","libmp3lame","-aq", "0",videoInfo.name + ".mp3");
+	var ffmpeg = process.ffmpeg(videoInfo.dir,"-i",videoInfo.file,"-y","-acodec","libmp3lame","-aq", "0","-ar","16000",videoInfo.name + ".mp3");
 	//不改编码
-	var ffmpeg = process.ffmpeg(videoInfo.dir,"-i",videoInfo.file,"-y","-vn","-acodec","copy",videoInfo.name + ".m4a");
+	//var ffmpeg = process.ffmpeg(videoInfo.dir,"-i",videoInfo.file,"-y","-vn","-acodec","copy",videoInfo.name + ".m4a");
 	ffmpeg.logResponse(winform.logger);
 	
 	ffmpeg.waitOne()

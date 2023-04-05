@@ -9,7 +9,7 @@ class summary{
 		this.charLen = ..string.len(subtitle)
 		this.maxMessage = maxMessage
 		this.messages = {
-        	{ "role": "system", "content": #prompt:defaultprompt }
+        	{ "role": "system", "content": #prompt ? prompt :defaultprompt }
         }
         this.resultMd = ''
 	};
@@ -38,7 +38,7 @@ class summary{
 		if(re){
 			this.tidyMessages();
 		}
-		return true; 
+		return re; 
 	}
 
 	ask = function(text){
@@ -80,8 +80,8 @@ class summary{
 			}while(gpt_num_tokens(s) <= remainNumTokens-100)
 			cur += 100*n
 			if(stream and callback){
-				this.askStream(s,callback)
-				return s,true,cur/this.charLen; 
+				var re = this.askStream(s,callback)
+				return s,re,cur/this.charLen; 
 			}else {
 				this.ask(s)
 				return s,this.messages[#this.messages].content,cur/this.charLen; 
@@ -95,13 +95,14 @@ class summary{
 namespace summary{
 	import web.rest.jsonClient
 	import util.metaProperty
-	var _dll = ..raw.loadDll($"~\lib\chatgpt\.dll\tiktoken_dll.dll",,"cdecl")
+	var _dll = ..raw.loadDll( $"~\lib\chatgpt\.dll\tiktoken_dll.dll",,"cdecl" );
+	//var _dll = ..raw.loadDll( ..io.appData("\chatsubtitle\chatgpt\tiktoken_dll.dll",$"~\lib\chatgpt\.dll\tiktoken_dll.dll"),"tiktoken_dll","cdecl" );
 	gpt_num_tokens = _dll.gpt_num_tokens
 	_meta = ..util.metaProperty(
 		numTokens = {
 			_get = lambda() reduce(owner.messages,function(prev,next,index,arr){
-				return prev + _dll.gpt_num_tokens(next.content) + 4
-			},0) + 2; 			
+				return prev + _dll.gpt_num_tokens(next.content:"") + 4
+			},0) + 2;		
 		}
 	)
 	
