@@ -14,7 +14,7 @@ richedit={cls="richedit";left=4;top=44;right=756;bottom=730;edge=1;multiline=1;v
 
 import fsys.dlg
 import thread.command
-import string.markdown
+import string.gfmark
 import inet.url
 import bili
 import fsys.config
@@ -387,15 +387,12 @@ winform.plus2.skin({
 	}
 })
 
-var markdown = string.markdown()
 var listener = thread.command();
-var markdown = string.markdown()
 var markdownContainer = "";
-
 listener.$updateWb = function( str ){
 	var str = eval(string.format("'%s'",str ))
 	markdownContainer = string.concat( markdownContainer,str )
-	wb.body.innerHTML = markdown.render( markdownContainer )
+	wb.body.innerHTML = string.gfmark.render( markdownContainer )
 }
 
 var config = fsys.config()
