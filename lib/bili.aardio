@@ -3,15 +3,14 @@ import inet.whttp
 import web.json
 //用inet.whttp替换inet.http,实现自定义cookie
 inet.http = inet.whttp
-
+import inet.httpFile
 class bili{
 	ctor( token ){
-		var client = ..web.rest.jsonClient()
-		client.setHeaders( 
+		this.client = ..web.rest.jsonClient()
+		this.client.setHeaders( 
 			["Cookie"] = ..string.format("SESSDATA=%s",token)
-		)
-	
-		this.api = client.api("https://api.bilibili.com/x")
+		)		
+		this.api = this.client.api("https://api.bilibili.com/x")
 	};
 	
 	getAid = function(bvid){
@@ -53,16 +52,56 @@ class bili{
 			},'WEBVTT\n\n')
 		}
 	}
+	
+	getVideoUrl = function(bvid){
+		var aid = this.getAid(bvid)
+		var cid = this.getCid(bvid)
+		var res = this.api.player.playurl.get({
+			avid = aid;
+			//bvid = bvid;
+			cid = cid;
+			qn = 112;
+			["type"] = "";
+			otype = "json";
+			platform = "html5";
+			high_quality = 1;
+		})
+		return res ? res.data.durl[1].url : res
+	}
+	
+	
+	downVideoUrl = function(vurl){
+		..console.log(vurl)
+		var remoteFile = ..inet.httpFile(vurl ,"/.download/")
+		
+/*
+		var ok,err,errCode = remoteFile.test()
+		
+		..console.log(ok,err,errCode)
+		if( ok ){
+			return true //console.logPause("文件已下载完成、服务器未更新,无需重新下载"); 
+		}
+*/
+		//下载文件
+		var ok,err,fileSize = remoteFile.download() 
+		return ok; 	
+	}
+
 	@_meta
 }
 
 namespace bili {
 	_duration2hms = lambda(sec) ..string.format("%02d:%02d:%02d.%d",..math.floor(sec/3600),sec/60%60,sec%60,sec%1*1000)
 }
-
-/*
-bilitoken = "xxxxxxxxxxxxxx";
-bilibili = bili("4d1170f2%2C1695873041%2C1b522%2A42")
-url = bilibili.getSubtitles("BV1hs4y177zp")
-vtt = bilibili.parse2vtt(url)
-*/
+/**
+import console
+bilitoken = "xxxxxxxx";
+bilibili = bili(bilitoken)
+bvid = "BV1Mo4y1p7cr"
+var url = bilibili.getVideoUrl(bvid)
+..console.dump( url )
+bilibili.downVideoUrl(url)
+..console.pause()
+// url = bilibili.getSubtitles("BV1hs4y177zp")
+//vtt = bilibili.parse2vtt(url)
+**/

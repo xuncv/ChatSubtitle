@@ -5,7 +5,7 @@ import win.ui;
 var winform = win.form(text="字幕总结";right=759;bottom=785)
 winform.add(
 button={cls="button";text="总结归纳去水";left=639;top=735;right=744;bottom=775;z=1};
-edit={cls="edit";left=24;top=740;right=629;bottom=772;edge=1;multiline=1;z=2};
+edit={cls="edit";left=6;top=740;right=611;bottom=772;edge=1;multiline=1;z=2};
 plus={cls="plus";left=7;top=10;right=39;bottom=40;bgcolor=-5197169;font=LOGFONT(h=-16);iconStyle={font=LOGFONT(h=-13;name='FontAwesome')};iconText='\uF0C5';notify=1;z=4};
 plus2={cls="plus";left=47;top=11;right=79;bottom=41;bgcolor=-5197169;font=LOGFONT(h=-16);iconStyle={font=LOGFONT(h=-13;name='FontAwesome')};iconText='\uF014';notify=1;z=5};
 richedit={cls="richedit";left=4;top=44;right=756;bottom=730;edge=1;multiline=1;vscroll=1;wrap=1;z=3}
@@ -424,6 +424,7 @@ winform.button.oncommand = function(id,event){
 	winform.button.disabled = true
 	winform.button.text = "运行中-0%"
 	winform.richedit.text = ""
+	markdownContainer = ""
 	thread.invoke(
 		function(subText,winform){
 			import chatgpt.summary;
