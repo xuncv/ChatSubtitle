@@ -11,3 +11,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 tiktoken = { git="https://github.com/anysphere/tiktoken-rs.git" }
+lazy_static = "1.4"

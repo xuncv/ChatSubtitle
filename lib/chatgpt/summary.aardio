@@ -116,6 +116,14 @@ namespace summary{
 `
 }
 
+// test
+/*
+import console
+ts = "你是一名专业的视频内容编辑，帮我用简体中文总结视频的内容精华"
+ts = ..string.repeat(1000,ts)
+..console.log( summary.gpt_num_tokens(ts) )
+console.pause()
+*/
 /**
 re = openai.completions({
 	"model":"gpt-3.5-turbo",
